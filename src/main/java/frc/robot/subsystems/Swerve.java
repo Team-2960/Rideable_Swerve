@@ -25,9 +25,9 @@ public class Swerve extends SubsystemBase {
 
     private final CANSparkMax mDrive;
     private final CANSparkMax mAngle;
-    private final CANcoder encAngle;
+    private final RelativeEncoder encAngle;
 
-    private final RelativeEncoder encDrive;
+    private final CANcoder encDrive;
 
     private final PIDController drivePidController;
     private final PIDController anglePIDController;
@@ -35,9 +35,6 @@ public class Swerve extends SubsystemBase {
     private final SimpleMotorFeedforward driveFeedForward;
     private final SimpleMotorFeedforward angleFeedForward;
 
-    private final ProfiledPIDController angleProfiledPIDController;
-
-    private final TrapezoidProfile.Constraints angleTrapezoidProfile;
 
     private SwerveModuleState desiredState;
 
@@ -46,9 +43,9 @@ public class Swerve extends SubsystemBase {
         // init motors
         mDrive = new CANSparkMax(driveMotorID, MotorType.kBrushless);
         mAngle = new CANSparkMax(angleMotorID, MotorType.kBrushless);
-        encAngle = new CANcoder(angleMotorEncID);//angle and drive encoders may be swapped
+        encDrive = new CANcoder(angleMotorEncID);//angle and drive encoders may be swapped
 
-        encDrive = mDrive.getEncoder();
+        encAngle = mAngle.getEncoder();
 
         // Drive rate Control
         drivePidController = new PIDController(
@@ -95,12 +92,12 @@ public class Swerve extends SubsystemBase {
      * 
      * @return current swerve module angle
      */
-    public Rotation2d getCurrentAngle() {
-        return Rotation2d.fromRotations(encAngle.getAbsolutePosition().getValueAsDouble());
+    public Rotation2d getAnglePos() {
+        return Rotation2d.fromRotations(encAngle.getPosition());
     }
 
-    public Rotation2d getAnglePos(){
-        return Rotation2d.fromRadians(encAngle.getPosition());
+    public double getAngleRate(){
+        return encAngle.getVelocity();
     }
 
     /**
@@ -109,7 +106,7 @@ public class Swerve extends SubsystemBase {
      * @return current swerve module drive speed
      */
     public double getCurrentVelocity() {
-        return (encDrive.getVelocity() / Constants.driveGearRatio) * Constants.wheelCirc;
+        return (encDrive.getVelocity().getValueAsDouble() / Constants.driveGearRatio) * Constants.wheelCirc;
     }
 
     /**
@@ -118,7 +115,7 @@ public class Swerve extends SubsystemBase {
      * @return current swerve module drive distance
      */
     public double getCurrentDrivePos() {
-        return (encDrive.getPosition() / Constants.driveGearRatio * Constants.wheelCirc);
+        return (encDrive.getPosition().getValueAsDouble() / Constants.driveGearRatio * Constants.wheelCirc);
     }
 
     /**
@@ -127,7 +124,7 @@ public class Swerve extends SubsystemBase {
      * @return current swerve module positions
      */
     public SwerveModulePosition getPosition() {
-        return new SwerveModulePosition(getCurrentDrivePos(), getCurrentAngle());
+        return new SwerveModulePosition(getCurrentDrivePos(), getAnglePos());
     }
 
     /**
@@ -144,14 +141,13 @@ public class Swerve extends SubsystemBase {
      */
     @Override
     public void periodic() {
-        var encoderRotation = getCurrentAngle();
+        var encoderRotation = getAnglePos();
 
         // Optimize
         SwerveModuleState state = SwerveModuleState.optimize(desiredState, encoderRotation);
 
         updateDrive(state);
         updateAngle(state);
-        updateUI();
     }
 
     /**
@@ -184,33 +180,24 @@ public class Swerve extends SubsystemBase {
             direction *= -1;
         }
 
-        double targetRate = Math.min(1.0, compareError / Constants.swerveAngleRampDist.getRadians())
-    }
-        double curMetersPerSec = getCurrentVelocity();
+        double targetRate = Math.min(1.0, compareError / Constants.swerveAngleRampDist.getRadians());
+        double angleVelocity = targetRate * direction;
 
-        
+        //Calculate motor output
+        double pidOutput = anglePIDController.calculate(getAngleRate(), angleVelocity);
+        double ffOutput = angleFeedForward.calculate(angleVelocity);
 
-        final double outputDriveFF = driveFeedForward.calculate(state.speedMetersPerSecond);
+        //set motor output
+        mAngle.setVoltage(pidOutput + ffOutput);
 
-        double turnOutput = angleProfiledPIDController.calculate(
-                encoderRotation.getRadians(),
-                state.angle.getRadians());
-
-        
-
-        double finalError = compareError * direction;
-        double angleVelocity = finalError * rampRate;
-        double turnOutput0 = anglePIDController.calculate(angleVelocity);
-        double outputAngleFF = angleFeedForward.calculate(angleVelocity);
-
-        mDrive.setVoltage(driveOutput + outputAngleFF);
-        mAngle.setVoltage(turnOutput0 + outputAngleFF);
-
-        SmartDashboard.putNumber("driveVelocity", encDrive.getVelocity());
+        SmartDashboard.putNumber("driveVelocity", encDrive.getVelocity().getValueAsDouble());
         SmartDashboard.putNumber("state.SpeedMeters/second", state.speedMetersPerSecond);
         SmartDashboard.putNumber("Error", error);
         SmartDashboard.putNumber("Desired Angle", state.angle.getRadians());
         SmartDashboard.putNumber("Current Angle", encoderRotation.getRadians());
     }
 
+        
 }
+
+
