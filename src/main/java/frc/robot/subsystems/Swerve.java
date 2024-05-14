@@ -99,6 +99,10 @@ public class Swerve extends SubsystemBase {
         return Rotation2d.fromRotations(encAngle.getAbsolutePosition().getValueAsDouble());
     }
 
+    public Rotation2d getAnglePos(){
+        return Rotation2d.fromRadians(encAngle.getPosition());
+    }
+
     /**
      * Gets the current drive speed
      * 
@@ -166,7 +170,21 @@ public class Swerve extends SubsystemBase {
     }
 
     private void updateAngle(SwerveModuleState state){
-        
+        //Get current module angle
+        Rotation2d encoderRotation = getAnglePos();
+
+        //Calculate target rate
+        double error = encoderRotation.getRadians() - state.angle.getRadians();
+        double compError = 2 * Math.PI - (Math.abs(error));
+        double compareError = Math.min(Math.abs(error), compError);
+        double direction = error > 0 ? 1 : -1;
+        double rampRate = 20;
+
+        if (compareError == compError) {
+            direction *= -1;
+        }
+
+        double targetRate = Math.min(1.0, compareError / Constants.swerveAngleRampDist.getRadians())
     }
         double curMetersPerSec = getCurrentVelocity();
 
@@ -178,15 +196,7 @@ public class Swerve extends SubsystemBase {
                 encoderRotation.getRadians(),
                 state.angle.getRadians());
 
-        double error = encoderRotation.getRadians() - state.angle.getRadians();
-        double compError = 2 * Math.PI - (Math.abs(error));
-        double compareError = Math.min(Math.abs(error), compError);
-        double direction = error > 0 ? 1 : -1;
-        double rampRate = 20;
-
-        if (compareError == compError) {
-            direction *= -1;
-        }
+        
 
         double finalError = compareError * direction;
         double angleVelocity = finalError * rampRate;
