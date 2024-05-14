@@ -5,6 +5,9 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.subsystems.Drive;
+
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -18,11 +21,16 @@ public class Robot extends TimedRobot {
    * initialization code.
    */
   @Override
-  public void robotInit() {}
+  public void robotInit() {
+    var drive = Drive.getInstance();
+    var oi = OI.getInstance();
+  }
 
   @Override
-  public void robotPeriodic() {}
-
+  public void robotPeriodic() {
+    CommandScheduler.getInstance().run();
+  }
+  
   @Override
   public void autonomousInit() {}
 

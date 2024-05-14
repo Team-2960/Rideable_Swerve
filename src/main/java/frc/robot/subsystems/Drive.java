@@ -13,6 +13,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 
@@ -26,7 +27,7 @@ public class Drive extends SubsystemBase {
     private final Translation2d backLeftLocation;
     private final Translation2d backRightLocation;
 
-    private final Swerve frontLeft;
+    final Swerve frontLeft;
     private final Swerve frontRight;
     private final Swerve backLeft;
     private final Swerve backRight;
@@ -39,37 +40,37 @@ public class Drive extends SubsystemBase {
     private Pose2d getPosition;
 
     private Drive() {
-        frontLeftLocation = new Translation2d(0, 0);
-        frontRightLocation = new Translation2d(0, 0);
-        backLeftLocation = new Translation2d(0, 0);
-        backRightLocation = new Translation2d(0, 0);// TODO enter swerve coordinates
+        frontLeftLocation = new Translation2d((Constants.robotLength / 2 - Constants.wheelInset),
+                -(Constants.robotLength / 2 - Constants.wheelInset));
+        frontRightLocation = new Translation2d((Constants.robotLength / 2 - Constants.wheelInset),
+                (Constants.robotLength / 2 - Constants.wheelInset));
+        backLeftLocation = new Translation2d(-(Constants.robotLength / 2 - Constants.wheelInset),
+                -(Constants.robotLength / 2 - Constants.wheelInset));
+        backRightLocation = new Translation2d(-(Constants.robotLength / 2 - Constants.wheelInset),
+                (Constants.robotLength / 2 - Constants.wheelInset));
 
         kinematics = new SwerveDriveKinematics(
                 frontLeftLocation, frontRightLocation, backLeftLocation, backRightLocation);
 
         frontLeft = new Swerve(
                 Constants.FLDriveM,
-                Constants.FLAngleEnc,
-                Constants.FLAngleEnc,
-                "FrontLeft");
+                Constants.FLAngleM,
+                Constants.FLAngleEnc);
 
         frontRight = new Swerve(
                 Constants.FRDriveM,
                 Constants.FRAngleM,
-                Constants.FRAngleEnc,
-                "FrontRight");
+                Constants.FRAngleEnc);
 
         backLeft = new Swerve(
                 Constants.BLDriveM,
                 Constants.BLAngleM,
-                Constants.BLAngleEnc,
-                "BackLeft");
+                Constants.BLAngleEnc);
 
         backRight = new Swerve(
                 Constants.BRDriveM,
                 Constants.BRAngleM,
-                Constants.BRAngleEnc,
-                "BackRight");
+                Constants.BRAngleEnc);
 
         navx = new AHRS(SPI.Port.kMXP);
         navx.reset();
@@ -86,7 +87,7 @@ public class Drive extends SubsystemBase {
                 },
                 new Pose2d(),
                 VecBuilder.fill(1, 1, Units.degreesToRadians(5)),
-                VecBuilder.fill(1, 1, Units.degreesToRadians(5)));//I don't know what this does
+                VecBuilder.fill(1, 1, Units.degreesToRadians(5)));// I don't know what this does
     }
 
     public void setSpeed(double xSpeed, double ySpeed, double rSpeed, boolean fieldRelative) {
@@ -127,6 +128,8 @@ public class Drive extends SubsystemBase {
                         backLeft.getPosition(),
                         backRight.getPosition()
                 });
+        swerveDrivePoseEstimator.addVisionMeasurement(pose, timeStamp);
+        
     }
 
     public static Drive getInstance() {
