@@ -22,27 +22,27 @@ public class Constants {
     public static int BRAngleM = 7;
     public static int BRAngleEnc = 11;
     // PID/FF values TODO PID values
-    public static double driveSwerveP = .2;
+    public static double driveSwerveP = 1;
     public static double driveSwerveI = 0;
     public static double driveSwerveD = 0;
 
-    public static double angleSwerveP = .2;
+    public static double angleSwerveP = 0;
     public static double angleSwerveI = 0;
     public static double angleSwerveD = 0;
 
-    public static double driveSwerveSFF = 0;
-    public static double driveSwerveVFF = 0;
-    public static double driveSwerveAFF = 0;
+    public static double driveSwerveSFF = 0.01;
+    public static double driveSwerveVFF = 0.01;
+    public static double driveSwerveAFF = 0.01;
 
     public static double angleSwerveSFF = 0;
     public static double angleSwerveVFF = 0;
     public static double angleSwerveAFF = 0;
     // Speeds
-    public static double maxSwerveAngleSpeed = 2;
-    public static double maxSwerveAngleAccel = 2;
+    public static double maxSwerveAngleSpeed = 10;
+    public static double maxSwerveAngleAccel = 10;
 
-    public final static double kMaxSpeed = 5;
-    public final static double kMaxAngularSpeed = 3;
+    public final static double kMaxSpeed = 1;
+    public final static double kMaxAngularSpeed = 1;
 
     // Gear Ratios
     public static double driveGearRatio = 6.86;// TODO change this to gear ratio
