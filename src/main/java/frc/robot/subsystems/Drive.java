@@ -88,6 +88,11 @@ public class Drive extends SubsystemBase {
                 new Pose2d(),
                 VecBuilder.fill(1, 1, Units.degreesToRadians(5)),
                 VecBuilder.fill(1, 1, Units.degreesToRadians(5)));// I don't know what this does
+
+                SmartDashboard.putNumber("FrontLeft", frontLeft.getAnglePos().getRadians());
+                SmartDashboard.putNumber("FrontRight", frontRight.getAnglePos().getRadians());
+                SmartDashboard.putNumber("BackLeft", backLeft.getAnglePos().getRadians());
+                SmartDashboard.putNumber("BackRight", backRight.getAnglePos().getRadians());
     }
 
     public void setSpeed(double xSpeed, double ySpeed, double rSpeed, boolean fieldRelative) {
