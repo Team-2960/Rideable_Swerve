@@ -95,7 +95,12 @@ public class Swerve extends SubsystemBase {
     public Rotation2d getAnglePos() {
         return Rotation2d.fromRotations(encAngle.getPosition());
     }
-
+   
+    /**
+     * gets the current swerve module angle rate
+     * 
+     * @return angle rate
+     */
     public double getAngleRate(){
         return encAngle.getVelocity();
     }
@@ -116,6 +121,15 @@ public class Swerve extends SubsystemBase {
      */
     public double getCurrentDrivePos() {
         return (encDrive.getPosition().getValueAsDouble() / Constants.driveGearRatio * Constants.wheelCirc);
+    }
+    
+    /**
+     * Gets the current module state
+     * 
+     * @return current swerve module positions
+     */
+    public SwerveModuleState getState(){
+        return new SwerveModuleState(getCurrentVelocity(), getAnglePos());
     }
 
     /**
@@ -141,10 +155,9 @@ public class Swerve extends SubsystemBase {
      */
     @Override
     public void periodic() {
-        var encoderRotation = getAnglePos();
 
         // Optimize
-        SwerveModuleState state = SwerveModuleState.optimize(desiredState, encoderRotation);
+        SwerveModuleState state = SwerveModuleState.optimize(desiredState, getAnglePos());
 
         updateDrive(state);
         updateAngle(state);
@@ -162,9 +175,14 @@ public class Swerve extends SubsystemBase {
 
         double ffOutput = driveFeedForward.calculate(state.speedMetersPerSecond);
 
-        mDrive.setVoltage(pidOutput * ffOutput);
+        //mDrive.setVoltage(pidOutput * ffOutput);
+        mDrive.setVoltage(pidOutput);
     }
-
+    
+    /**
+     * Updates the angle position and the rate controllers
+     * @param state
+     */
     private void updateAngle(SwerveModuleState state){
         //Get current module angle
         Rotation2d encoderRotation = getAnglePos();
@@ -188,7 +206,8 @@ public class Swerve extends SubsystemBase {
         double ffOutput = angleFeedForward.calculate(angleVelocity);
 
         //set motor output
-        mAngle.setVoltage(pidOutput + ffOutput);
+        //mAngle.setVoltage(pidOutput + ffOutput);
+        mAngle.setVoltage(pidOutput * 1);
 
         SmartDashboard.putNumber("driveVelocity", encDrive.getVelocity().getValueAsDouble());
         SmartDashboard.putNumber("state.SpeedMeters/second", state.speedMetersPerSecond);
