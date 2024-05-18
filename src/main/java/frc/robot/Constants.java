@@ -41,7 +41,7 @@ public class Constants {
     public static double maxSwerveAngleSpeed = 10;
     public static double maxSwerveAngleAccel = 10;
 
-    public final static double kMaxSpeed = 1;
+    public final static double kMaxSpeed = 5;
     public final static double kMaxAngularSpeed = 1;
 
     // Gear Ratios
