@@ -176,7 +176,7 @@ public class Swerve extends SubsystemBase {
         double ffOutput = driveFeedForward.calculate(state.speedMetersPerSecond);
 
         //mDrive.setVoltage(pidOutput * ffOutput);
-        mDrive.setVoltage(pidOutput);
+        mDrive.setVoltage(pidOutput + ffOutput);
     }
     
     /**
@@ -192,13 +192,12 @@ public class Swerve extends SubsystemBase {
         double compError = 2 * Math.PI - (Math.abs(error));
         double compareError = Math.min(Math.abs(error), compError);
         double direction = error > 0 ? 1 : -1;
-        double rampRate = 20;
 
         if (compareError == compError) {
             direction *= -1;
         }
 
-        double targetRate = Math.min(1.0, compareError / Constants.swerveAngleRampDist.getRadians());
+        double targetRate = Math.min(1.0, compareError / Constants.swerveAngleRampDist.getRadians()) * Constants.maxSwerveAngleSpeed;
         double angleVelocity = targetRate * direction;
 
         //Calculate motor output
@@ -207,13 +206,14 @@ public class Swerve extends SubsystemBase {
 
         //set motor output
         //mAngle.setVoltage(pidOutput + ffOutput);
-        mAngle.setVoltage(pidOutput * 1);
+        mAngle.setVoltage(pidOutput + ffOutput);
 
         SmartDashboard.putNumber("driveVelocity", encDrive.getVelocity().getValueAsDouble());
         SmartDashboard.putNumber("state.SpeedMeters/second", state.speedMetersPerSecond);
         SmartDashboard.putNumber("Error", error);
-        SmartDashboard.putNumber("Desired Angle", state.angle.getRadians());
-        SmartDashboard.putNumber("Current Angle", encoderRotation.getRadians());
+        SmartDashboard.putNumber("Desired Angle", state.angle.getDegrees());
+        SmartDashboard.putNumber("Current Angle", encoderRotation.getDegrees());
+        SmartDashboard.putNumber("RampDistance", Constants.swerveAngleRampDist.getDegrees());
     }
 
         
