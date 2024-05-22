@@ -40,14 +40,13 @@ public class Drive extends SubsystemBase {
     private Pose2d getPosition;
 
     private Drive() {
-        frontLeftLocation = new Translation2d((Constants.robotLength / 2 - Constants.wheelInset),
-                -(Constants.robotLength / 2 - Constants.wheelInset));
-        frontRightLocation = new Translation2d((Constants.robotLength / 2 - Constants.wheelInset),
-                (Constants.robotLength / 2 - Constants.wheelInset));
-        backLeftLocation = new Translation2d(-(Constants.robotLength / 2 - Constants.wheelInset),
-                -(Constants.robotLength / 2 - Constants.wheelInset));
-        backRightLocation = new Translation2d(-(Constants.robotLength / 2 - Constants.wheelInset),
-                (Constants.robotLength / 2 - Constants.wheelInset));
+        double x_pos = (Constants.robotLength / 2 - Constants.wheelInset);
+        double y_pos = (Constants.robotLength / 2 - Constants.wheelInset);
+
+        frontLeftLocation = new Translation2d(x_pos, y_pos);
+        frontRightLocation = new Translation2d(x_pos, -y_pos);
+        backLeftLocation = new Translation2d(-x_pos, y_pos);
+        backRightLocation = new Translation2d(-x_pos, -y_pos);
 
         kinematics = new SwerveDriveKinematics(
                 frontLeftLocation, frontRightLocation, backLeftLocation, backRightLocation);
@@ -55,22 +54,26 @@ public class Drive extends SubsystemBase {
         frontLeft = new Swerve(
                 Constants.FLDriveM,
                 Constants.FLAngleM,
-                Constants.FLAngleEnc);
+                Constants.FLAngleEnc,
+                "FL");
 
         frontRight = new Swerve(
                 Constants.FRDriveM,
                 Constants.FRAngleM,
-                Constants.FRAngleEnc);
+                Constants.FRAngleEnc,
+                "FR");
 
         backLeft = new Swerve(
                 Constants.BLDriveM,
                 Constants.BLAngleM,
-                Constants.BLAngleEnc);
+                Constants.BLAngleEnc,
+                "BL");
 
         backRight = new Swerve(
                 Constants.BRDriveM,
                 Constants.BRAngleM,
-                Constants.BRAngleEnc);
+                Constants.BRAngleEnc,
+                "BR");
 
         navx = new AHRS(SPI.Port.kMXP);
         navx.reset();
@@ -97,11 +100,12 @@ public class Drive extends SubsystemBase {
 
     public void setSpeed(double xSpeed, double ySpeed, double rSpeed, boolean fieldRelative) {
         ChassisSpeeds speeds;
-        if (fieldRelative) {
-            speeds = ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rSpeed, navx.getRotation2d());
-        } else {
-            speeds = new ChassisSpeeds(xSpeed, ySpeed, rSpeed);
-        }
+        // if (fieldRelative) {
+        //     speeds = ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rSpeed, navx.getRotation2d());
+        // } else {
+        //     speeds = new ChassisSpeeds(xSpeed, ySpeed, rSpeed);
+        // }
+         speeds = new ChassisSpeeds(xSpeed, ySpeed, rSpeed);
 
         speeds = ChassisSpeeds.discretize(speeds, Constants.updatePeriod);
 

@@ -16,33 +16,33 @@ public class Constants {
 
     public static int BLDriveM = 4;
     public static int BLAngleM = 3;
-    public static int BLAngleEnc = 10;
+    public static int BLAngleEnc = 11;
 
     public static int BRDriveM = 6;
     public static int BRAngleM = 5;
-    public static int BRAngleEnc = 11;
+    public static int BRAngleEnc = 10;
     // PID/FF values TODO PID values
-    public static double driveSwerveP = .5;
+    public static double driveSwerveP = 0;//.000014912;
     public static double driveSwerveI = 0;
     public static double driveSwerveD = 0;
 
-    public static double angleSwerveP = .005;
+    public static double angleSwerveP = 0.01;//0.00000017;
     public static double angleSwerveI = 0;
-    public static double angleSwerveD = 0;
+    public static double angleSwerveD = 0;//0.001;
 
     public static double driveSwerveSFF = 0;
-    public static double driveSwerveVFF = 2.25;
+    public static double driveSwerveVFF = .95;
     public static double driveSwerveAFF = 0;
 
-    public static double angleSwerveSFF = 0;
-    public static double angleSwerveVFF = 0.1;
-    public static double angleSwerveAFF = 0.1;
+    public static double angleSwerveSFF = 0.01;
+    public static double angleSwerveVFF = 0.55;
+    public static double angleSwerveAFF = 0;
     // Speeds
-    public static double maxSwerveAngleSpeed = 4 * Math.PI;
-    public static double maxSwerveAngleAccel = 10 * Math.PI;
+    public static final double maxSwerveAngleSpeed = 2 * Math.PI;
+    public static final double maxSwerveAngleAccel = 2 * Math.PI;
 
-    public final static double kMaxSpeed = 2.5;
-    public final static double kMaxAngularSpeed = 1.5 * 2 * Math.PI;
+    public final static double kMaxSpeed = 4.5;
+    public final static double kMaxAngularSpeed = 2 * 2 * Math.PI;
 
     // Gear Ratios
     public static double driveGearRatio = 6.86;// TODO change this to gear ratio

@@ -31,9 +31,9 @@ public class OI extends SubsystemBase {
         if (DriverStation.isTeleop()) {
             boolean fieldRelative = false;
 
-            double xSpeed = -MathUtil.applyDeadband(driverController.getRawAxis(1), 0.1) * Constants.kMaxSpeed;
-            double ySpeed = MathUtil.applyDeadband(driverController.getRawAxis(0), 0.1) * Constants.kMaxSpeed;
-            double rSpeed = MathUtil.applyDeadband(driverController.getRawAxis(4), 0.1) * Constants.kMaxAngularSpeed;
+            double xSpeed = MathUtil.applyDeadband(-driverController.getRawAxis(1), 0.1) * Constants.kMaxSpeed;
+            double ySpeed = MathUtil.applyDeadband(-driverController.getRawAxis(0), 0.1) * Constants.kMaxSpeed;
+            double rSpeed = MathUtil.applyDeadband(-driverController.getRawAxis(4), 0.1) * Constants.kMaxAngularSpeed;
 
             Drive.getInstance().setSpeed(xSpeed, ySpeed, rSpeed, fieldRelative);
             SmartDashboard.putNumber("ySpeed", ySpeed);
