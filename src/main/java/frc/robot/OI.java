@@ -31,16 +31,6 @@ public class OI extends SubsystemBase {
         if (DriverStation.isTeleop()) {
             boolean fieldRelative = false;
 
-            if(driverController.getRawButton(6)){
-                fieldRelative = true;
-            }else{
-                fieldRelative = false;
-            }
-
-            if (driverController.getRawButton(1)){
-                Drive.getInstance().restPosition();
-            }
-
             double xSpeed = MathUtil.applyDeadband(-driverController.getRawAxis(1), 0.1) * Constants.kMaxSpeed;
             double ySpeed = MathUtil.applyDeadband(-driverController.getRawAxis(0), 0.1) * Constants.kMaxSpeed;
             double rSpeed = MathUtil.applyDeadband(-driverController.getRawAxis(4), 0.1) * Constants.kMaxAngularSpeed;
