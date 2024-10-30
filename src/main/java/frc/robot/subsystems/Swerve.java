@@ -160,10 +160,10 @@ public class Swerve extends SubsystemBase {
     public void periodic() {
 
         // Optimize
-        //SwerveModuleState state = SwerveModuleState.optimize(desiredState, getAnglePos());
+        SwerveModuleState state = SwerveModuleState.optimize(desiredState, getAnglePos());
 
-        updateDrive(desiredState);
-        updateAngle(desiredState);
+        updateDrive(state);
+        updateAngle(state);
     }
 
     /**

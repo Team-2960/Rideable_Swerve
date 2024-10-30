@@ -100,13 +100,13 @@ public class Drive extends SubsystemBase {
 
     public void setSpeed(double xSpeed, double ySpeed, double rSpeed, boolean fieldRelative) {
         ChassisSpeeds speeds;
-        // if (fieldRelative) {
-        //     speeds = ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rSpeed, navx.getRotation2d());
-        // } else {
-        //     speeds = new ChassisSpeeds(xSpeed, ySpeed, rSpeed);
-        // }
-         speeds = new ChassisSpeeds(xSpeed, ySpeed, rSpeed);
-
+        if (fieldRelative) {
+            Pose2d robot_pose = getEstimatedPos();
+            Rotation2d fieldAngle = Rotation2d.fromDegrees(360).minus(robot_pose.getRotation());
+            speeds = ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rSpeed, fieldAngle);
+        } else {
+                speeds = new ChassisSpeeds(xSpeed, ySpeed, rSpeed);
+        }
         speeds = ChassisSpeeds.discretize(speeds, Constants.updatePeriod);
 
         var swerveModuleState = kinematics.toSwerveModuleStates(speeds);
@@ -117,7 +117,8 @@ public class Drive extends SubsystemBase {
         frontRight.setDesiredState(swerveModuleState[1]);
         backLeft.setDesiredState(swerveModuleState[2]);
         backRight.setDesiredState(swerveModuleState[3]);
-    }
+}
+    
 
     public void setVector(double speed, Rotation2d heading, double rSpeed) {
         double xSpeed = Math.cos(heading.getRadians()) * speed;
@@ -139,6 +140,15 @@ public class Drive extends SubsystemBase {
                 });
         swerveDrivePoseEstimator.addVisionMeasurement(pose, timeStamp);
         
+    }
+
+    public void restPosition(){
+        swerveDrivePoseEstimator.resetPosition(Rotation2d.fromDegrees(0), new SwerveModulePosition[] {
+                        frontLeft.getPosition(),
+                        frontRight.getPosition(),
+                        backLeft.getPosition(),
+                        backRight.getPosition()
+                }, new Pose2d(0, 0, Rotation2d.fromDegrees(0)));
     }
 
     public static Drive getInstance() {
